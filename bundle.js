@@ -5,7 +5,7 @@ const nodeBuiltins = require('rollup-plugin-node-builtins');
 const nodeGlobals = require('rollup-plugin-node-globals');
 const nodeResolve = require('rollup-plugin-node-resolve');
 const path = require('path');
-const readline = require('readline');
+const rimraf = require('rimraf');
 const rollup = require('rollup');
 
 const rollupPlugins = [
@@ -16,41 +16,39 @@ const rollupPlugins = [
 ];
 
 async function bundleModule(modulePath) {
-  const outputPath = path.join(
+  const esModulePath = path.join(
     await findESModulesPath(),
-    `${path.basename(modulePath)}.js`,
+    path.basename(modulePath),
   );
+  const versionPath = path.join(esModulePath, '.version');
   const { version } = require(path.join(modulePath, 'package.json'));
   if (
-    !fs.existsSync(outputPath) ||
-    (await parseESModuleVersion(outputPath)) !== version
+    !fs.existsSync(versionPath) ||
+    fs.readFileSync(versionPath, 'utf8') !== version
   ) {
     await (await rollup.rollup({
       input: await resolveModuleEntry(modulePath),
       plugins: rollupPlugins,
     })).write({
-      banner: `/* version ${version} */`,
-      file: outputPath,
+      file: path.join(esModulePath, 'index.js'),
       format: 'es',
       sourcemap: true,
     });
+    fs.writeFileSync(versionPath, version);
   }
-}
-
-async function findESModuleNames() {
-  return fs
-    .readdirSync(await findESModulesPath())
-    .filter(filename => filename.endsWith('.js'))
-    .map(filename => filename.replace(/\.js$/, ''));
 }
 
 async function findESModulesPath() {
   return path.join(await findPrefixPath(), 'es_modules');
 }
 
-async function findExcessiveESModuleNames(modulePaths) {
+async function findExcessiveESModulePaths(modulePaths) {
+  const modulesPath = await findESModulesPath();
   const names = modulePaths.map(modulePath => path.basename(modulePath));
-  return (await findESModuleNames()).filter(name => !names.includes(name));
+  return fs
+    .readdirSync(modulesPath)
+    .filter(filename => !names.includes(filename))
+    .map(filename => path.join(modulesPath, filename));
 }
 
 async function findModuleNames() {
@@ -82,31 +80,6 @@ async function findPrefixPath() {
   return findPrefixPath.prefixPath;
 }
 
-function parseESModuleVersion(modulePath) {
-  return new Promise((resolve, reject) => {
-    let firstLine;
-    const interface = readline.createInterface({
-      input: fs.createReadStream(modulePath),
-    });
-    interface.on('close', () =>
-      resolve(firstLine.match(/^\/\* version (.+?) \*\/$/)[1]),
-    );
-    interface.on('line', line => {
-      firstLine = line;
-      interface.close();
-    });
-  });
-}
-
-async function removeESModule(name) {
-  const scriptPath = path.join(await findESModulesPath(), `${name}.js`);
-  for (const removePath of [scriptPath, `${scriptPath}.map`]) {
-    if (fs.existsSync(removePath)) {
-      fs.unlinkSync(removePath);
-    }
-  }
-}
-
 function resolveModuleEntry(modulePath) {
   return rollupPlugins
     .find(plugin => plugin.name === 'node-resolve')
@@ -118,7 +91,7 @@ module.exports = async function bundle() {
   for (const modulePath of modulePaths) {
     await bundleModule(modulePath);
   }
-  for (const name of await findExcessiveESModuleNames(modulePaths)) {
-    await removeESModule(name);
+  for (const modulePath of await findExcessiveESModulePaths(modulePaths)) {
+    rimraf.sync(modulePath);
   }
 };

@@ -1,5 +1,3 @@
-es_modules/*/index.js*
-
 support package namespaces
 eslint
 prettier
