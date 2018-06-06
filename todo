@@ -4,8 +4,6 @@ prettier
 another name
 
 later
-  tests
-    travis
   package.json: keywords
   readme
     usage
@@ -21,6 +19,9 @@ later
       strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
   publish bundled version
 future
+  tests
+    travis
+      badge
   import { map } from 'rxjs/operators';
   multiprocess bundling
   .min.js for production
