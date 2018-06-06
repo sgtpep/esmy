@@ -24,6 +24,7 @@ later
     take from https://jspm.io/
     link to https://jspm.io/
     limitations https://github.com/jspm/project/issues/38
+  publish bundled version
   move this note to docs
 resources
   https://github.com/dherman/defense-of-dot-js/blob/master/proposal.md
