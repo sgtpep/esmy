@@ -25,7 +25,27 @@ async function bundleModule(modulePath) {
     '../es_modules',
     `${path.basename(modulePath)}.js`,
   );
-  await bundle.write({ file: outputPath, format: 'es' });
+  await bundle.write({ file: outputPath, format: 'es', sourcemap: true });
+}
+
+async function findModulePaths() {
+  const prefix = await findNPMPrefix(process.cwd());
+  const names = await findModules();
+  return names
+    .map(name => path.join(prefix, 'node_modules', name))
+    .filter(modulePath => fs.statSync(modulePath).isDirectory());
+}
+
+async function findModules() {
+  const prefix = await findNPMPrefix(process.cwd());
+  const packagePath = path.join(prefix, 'package.json');
+  if (fs.existsSync(packagePath)) {
+    return Object.keys(require(packagePath).dependencies || {});
+  } else {
+    return fs
+      .readdirSync(path.join(prefix, 'node_modules'))
+      .filter(name => !path.basename(name).startsWith('.'));
+  }
 }
 
 function resolveModuleEntry(modulePath) {
@@ -35,16 +55,8 @@ function resolveModuleEntry(modulePath) {
 }
 
 module.exports = async function bundle() {
-  const prefix = await findNPMPrefix(process.cwd());
-  const modulesPath = path.join(prefix, 'node_modules');
-  if (fs.existsSync(modulesPath)) {
-    //    for (const name of fs.readdirSync(modulesPath)) {
-    const name = 'hyperscript';
-    const modulePath = path.join(modulesPath, name);
-    if (fs.statSync(modulePath).isDirectory() && !name.startsWith('.')) {
-      await bundleModule(modulePath);
-      process.exit();
-    }
-    //    }
+  const modulePaths = await findModulePaths();
+  for (const modulePath of modulePaths) {
+    await bundleModule(modulePath);
   }
 };
