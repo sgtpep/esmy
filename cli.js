@@ -24,7 +24,7 @@ async function main() {
     const command = await detectCommand();
     spawnSync(command, process.argv.slice(2), { stdio: 'inherit' });
   }
-  sync();
+  await sync();
 }
 
 main();
