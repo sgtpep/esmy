@@ -1,7 +1,4 @@
 skip failed conversions
-
-production: .min.js, development: .js
-  source maps
 support package namespaces
 try rxjs https://github.com/jspm/project/issues/38
 another name
@@ -27,6 +24,8 @@ later
   publish bundled version
 future
   multiprocess bundling
+  .min.js for production
+    source maps
 resources
   https://github.com/dherman/defense-of-dot-js/blob/master/proposal.md
   https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module
