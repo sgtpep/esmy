@@ -18,7 +18,9 @@ later
     usage
       cli
       package.json: install, npm, yarn commands
-    copy https://jspm.io/
+    take from https://jspm.io/
+    link to https://jspm.io/
+    limitations https://github.com/jspm/project/issues/38
   move this note to docs
 resources
   https://github.com/dherman/defense-of-dot-js/blob/master/proposal.md
