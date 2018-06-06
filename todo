@@ -1,0 +1,36 @@
+try package.json:install
+  npm, yarn
+  npm/yarn install
+  npm install foo, yarn add foo
+  npm uninstall foo, yarn remove foo
+features
+  rollup-plugin-commonjs
+  support package.json:module
+    add extensions
+    unqualified imports
+  fallback package.json:main
+  hyperscript: module.export
+  skip failed conversions
+  production: .min.js, development: .js
+    source maps
+later
+  eslint
+  prettier
+  tests
+    travis
+  package.json: keywords
+  readme
+    usage
+      cli
+      package.json: install, npm, yarn commands
+    copy https://jspm.io/
+  move this note to docs
+resources
+  https://github.com/dherman/defense-of-dot-js/blob/master/proposal.md
+  https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module
+  https://github.com/nodejs/node-eps/issues/13
+  https://github.com/jsforum/jsforum/issues/5
+  https://medium.com/webpack/webpack-and-rollup-the-same-but-different-a41ad427058c
+  https://rollupjs.org/guide/en#compatibility
+  https://github.com/rollup/rollup/wiki/pkg.module
+  https://github.com/stereobooster/package.json#package-bundlers
