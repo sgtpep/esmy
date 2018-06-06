@@ -1,0 +1,9 @@
+{
+  "author": "Danil Semelenov",
+  "bin": "./cli.js",
+  "description": "Converts npm packages to native ES6 modules to import them without bundlers and transpilers.",
+  "license": "ISC",
+  "name": "espm",
+  "repository": "https://github.com/sgtpep/espm.git",
+  "version": "1.0.0"
+}
