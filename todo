@@ -1,24 +1,16 @@
-only package.json:dependecies
-generate
+remove old
 skip present
 
-features
-  multiprocess bundling
-  rollup-plugin-commonjs
-  support package.json:module
-    add extensions
-    unqualified imports
-  fallback package.json:main
-  hyperscript: module.export
-  skip failed conversions
-  production: .min.js, development: .js
-    source maps
-  support package namespaces
-  rxjs https://github.com/jspm/project/issues/38
+skip failed conversions
+production: .min.js, development: .js
+  source maps
+support package namespaces
+try rxjs https://github.com/jspm/project/issues/38
+another name
+eslint
+prettier
+
 later
-  another name
-  eslint
-  prettier
   tests
     travis
   package.json: keywords
@@ -35,7 +27,8 @@ later
       duplication
       strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
   publish bundled version
-  move this note to docs
+future
+  multiprocess bundling
 resources
   https://github.com/dherman/defense-of-dot-js/blob/master/proposal.md
   https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module
