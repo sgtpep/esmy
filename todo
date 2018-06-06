@@ -1,7 +1,10 @@
+detect entry point
+only package.json:dependecies
 generate
-  skip present
+skip present
 
 features
+  multiprocess bundling
   rollup-plugin-commonjs
   support package.json:module
     add extensions
