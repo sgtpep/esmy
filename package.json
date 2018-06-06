@@ -1,6 +1,9 @@
 {
   "author": "Danil Semelenov",
   "bin": "./cli.js",
+  "dependencies": {
+    "find-npm-prefix": "^1.0.2"
+  },
   "description": "Converts npm packages to native ES6 modules to import them without bundlers and transpilers.",
   "license": "ISC",
   "name": "espm",
