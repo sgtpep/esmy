@@ -1,8 +1,3 @@
-try package.json:install
-  npm, yarn
-  npm/yarn install
-  npm install foo, yarn add foo
-  npm uninstall foo, yarn remove foo
 features
   rollup-plugin-commonjs
   support package.json:module
@@ -13,6 +8,10 @@ features
   skip failed conversions
   production: .min.js, development: .js
     source maps
+  jspm without arguments
+  jspm <package>...
+    detect by yarn.lock, package-lock.json
+    detect by available executable
 later
   eslint
   prettier
