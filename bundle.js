@@ -34,7 +34,7 @@ function resolveModuleEntry(modulePath) {
     .resolveId(path.basename(modulePath), path.dirname(modulePath));
 }
 
-module.exports = async function sync() {
+module.exports = async function bundle() {
   const prefix = await findNPMPrefix(process.cwd());
   const modulesPath = path.join(prefix, 'node_modules');
   if (fs.existsSync(modulesPath)) {

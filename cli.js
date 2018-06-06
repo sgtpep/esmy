@@ -1,8 +1,8 @@
 #!/usr/bin/env node
+const bundle = require('./bundle');
 const findNPMPrefix = require('find-npm-prefix');
 const fs = require('fs');
 const path = require('path');
-const sync = require('./sync');
 const { execSync, spawnSync } = require('child_process');
 
 async function detectCommand() {
@@ -24,7 +24,7 @@ async function main() {
     const command = await detectCommand();
     spawnSync(command, process.argv.slice(2), { stdio: 'inherit' });
   }
-  await sync();
+  await bundle();
 }
 
 main();
