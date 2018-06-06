@@ -12,6 +12,7 @@ features
   production: .min.js, development: .js
     source maps
 later
+  another name
   eslint
   prettier
   tests
