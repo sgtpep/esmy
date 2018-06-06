@@ -5,6 +5,7 @@ const nodeBuiltins = require('rollup-plugin-node-builtins');
 const nodeGlobals = require('rollup-plugin-node-globals');
 const nodeResolve = require('rollup-plugin-node-resolve');
 const path = require('path');
+const readline = require('readline');
 const rollup = require('rollup');
 
 const rollupPlugins = [
@@ -15,17 +16,25 @@ const rollupPlugins = [
 ];
 
 async function bundleModule(modulePath) {
-  await (await rollup.rollup({
-    input: await resolveModuleEntry(modulePath),
-    plugins: rollupPlugins,
-  })).write({
-    file: path.join(
-      await findESModulesPath(),
-      `${path.basename(modulePath)}.js`,
-    ),
-    format: 'es',
-    sourcemap: true,
-  });
+  const outputPath = path.join(
+    await findESModulesPath(),
+    `${path.basename(modulePath)}.js`,
+  );
+  const { version } = require(path.join(modulePath, 'package.json'));
+  if (
+    !fs.existsSync(outputPath) ||
+    (await parseESModuleVersion(outputPath)) !== version
+  ) {
+    await (await rollup.rollup({
+      input: await resolveModuleEntry(modulePath),
+      plugins: rollupPlugins,
+    })).write({
+      banner: `/* version ${version} */`,
+      file: outputPath,
+      format: 'es',
+      sourcemap: true,
+    });
+  }
 }
 
 async function findESModuleNames() {
@@ -71,6 +80,22 @@ async function findPrefixPath() {
     findPrefixPath.prefixPath = await findNPMPrefix(process.cwd());
   }
   return findPrefixPath.prefixPath;
+}
+
+function parseESModuleVersion(modulePath) {
+  return new Promise((resolve, reject) => {
+    let firstLine;
+    const interface = readline.createInterface({
+      input: fs.createReadStream(modulePath),
+    });
+    interface.on('close', () =>
+      resolve(firstLine.match(/^\/\* version (.+?) \*\/$/)[1]),
+    );
+    interface.on('line', line => {
+      firstLine = line;
+      interface.close();
+    });
+  });
 }
 
 async function removeESModule(name) {
