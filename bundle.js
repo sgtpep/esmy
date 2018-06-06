@@ -15,36 +15,70 @@ const rollupPlugins = [
 ];
 
 async function bundleModule(modulePath) {
-  const entryPath = await resolveModuleEntry(modulePath);
-  const bundle = await rollup.rollup({
-    input: entryPath,
+  await (await rollup.rollup({
+    input: await resolveModuleEntry(modulePath),
     plugins: rollupPlugins,
+  })).write({
+    file: path.join(
+      await findESModulesPath(),
+      `${path.basename(modulePath)}.js`,
+    ),
+    format: 'es',
+    sourcemap: true,
   });
-  const outputPath = path.join(
-    path.dirname(modulePath),
-    '../es_modules',
-    `${path.basename(modulePath)}.js`,
-  );
-  await bundle.write({ file: outputPath, format: 'es', sourcemap: true });
 }
 
-async function findModulePaths() {
-  const prefix = await findNPMPrefix(process.cwd());
-  const names = await findModules();
-  return names
-    .map(name => path.join(prefix, 'node_modules', name))
-    .filter(modulePath => fs.statSync(modulePath).isDirectory());
+async function findESModuleNames() {
+  return fs
+    .readdirSync(await findESModulesPath())
+    .filter(filename => filename.endsWith('.js'))
+    .map(filename => filename.replace(/\.js$/, ''));
 }
 
-async function findModules() {
-  const prefix = await findNPMPrefix(process.cwd());
-  const packagePath = path.join(prefix, 'package.json');
+async function findESModulesPath() {
+  return path.join(await findPrefixPath(), 'es_modules');
+}
+
+async function findExcessiveESModuleNames(modulePaths) {
+  const names = modulePaths.map(modulePath => path.basename(modulePath));
+  return (await findESModuleNames()).filter(name => !names.includes(name));
+}
+
+async function findModuleNames() {
+  const packagePath = path.join(await findPrefixPath(), 'package.json');
   if (fs.existsSync(packagePath)) {
     return Object.keys(require(packagePath).dependencies || {});
   } else {
     return fs
-      .readdirSync(path.join(prefix, 'node_modules'))
-      .filter(name => !path.basename(name).startsWith('.'));
+      .readdirSync(await findModulesPath())
+      .filter(filename => !path.basename(filename).startsWith('.'));
+  }
+}
+
+async function findModulePaths() {
+  const modulesPath = await findModulesPath();
+  return (await findModuleNames())
+    .map(name => path.join(modulesPath, name))
+    .filter(modulePath => fs.statSync(modulePath).isDirectory());
+}
+
+async function findModulesPath() {
+  return path.join(await findPrefixPath(), 'node_modules');
+}
+
+async function findPrefixPath() {
+  if (!findPrefixPath.prefixPath) {
+    findPrefixPath.prefixPath = await findNPMPrefix(process.cwd());
+  }
+  return findPrefixPath.prefixPath;
+}
+
+async function removeESModule(name) {
+  const scriptPath = path.join(await findESModulesPath(), `${name}.js`);
+  for (const removePath of [scriptPath, `${scriptPath}.map`]) {
+    if (fs.existsSync(removePath)) {
+      fs.unlinkSync(removePath);
+    }
   }
 }
 
@@ -58,5 +92,8 @@ module.exports = async function bundle() {
   const modulePaths = await findModulePaths();
   for (const modulePath of modulePaths) {
     await bundleModule(modulePath);
+  }
+  for (const name of await findExcessiveESModuleNames(modulePaths)) {
+    await removeESModule(name);
   }
 };

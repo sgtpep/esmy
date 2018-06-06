@@ -6,8 +6,7 @@ const path = require('path');
 const { execSync, spawnSync } = require('child_process');
 
 async function detectCommand() {
-  const prefix = await findNPMPrefix(process.cwd());
-  if (fs.existsSync(path.join(prefix, 'yarn.lock'))) {
+  if (fs.existsSync(await findYarnLockPath())) {
     return 'yarn';
   } else {
     try {
@@ -19,10 +18,15 @@ async function detectCommand() {
   }
 }
 
+async function findYarnLockPath() {
+  return path.join(await findNPMPrefix(process.cwd()), 'yarn.lock');
+}
+
 async function main() {
   if (process.argv.length > 2) {
-    const command = await detectCommand();
-    spawnSync(command, process.argv.slice(2), { stdio: 'inherit' });
+    spawnSync(await detectCommand(), process.argv.slice(2), {
+      stdio: 'inherit',
+    });
   }
   await bundle();
 }

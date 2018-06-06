@@ -1,7 +1,6 @@
-remove old
 skip present
-
 skip failed conversions
+
 production: .min.js, development: .js
   source maps
 support package namespaces
