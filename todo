@@ -1,9 +1,9 @@
-skip failed conversions
+es_modules/*/index.js*
+
 support package namespaces
-try rxjs https://github.com/jspm/project/issues/38
-another name
 eslint
 prettier
+another name
 
 later
   tests
@@ -23,6 +23,7 @@ later
       strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
   publish bundled version
 future
+  import { map } from 'rxjs/operators';
   multiprocess bundling
   .min.js for production
     source maps
