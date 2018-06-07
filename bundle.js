@@ -26,15 +26,23 @@ async function bundleModule(modulePath) {
     !fs.existsSync(versionPath) ||
     fs.readFileSync(versionPath, 'utf8') !== version
   ) {
-    await (await rollup.rollup({
-      input: await resolveModuleEntry(modulePath),
-      plugins: rollupPlugins,
-    })).write({
-      file: path.join(esModulePath, 'index.js'),
-      format: 'es',
-      sourcemap: true,
-    });
-    fs.writeFileSync(versionPath, version);
+    const bundle = await rollup
+      .rollup({
+        input: await resolveModuleEntry(modulePath),
+        onwarn: throwException,
+        plugins: rollupPlugins,
+      })
+      .catch(error => console.error(error.message));
+    if (bundle) {
+      await bundle.write({
+        file: path.join(esModulePath, 'index.js'),
+        format: 'es',
+        sourcemap: true,
+      });
+      fs.writeFileSync(versionPath, version);
+    } else {
+      rimraf.sync(esModulePath);
+    }
   }
 }
 
@@ -84,6 +92,10 @@ function resolveModuleEntry(modulePath) {
   return rollupPlugins
     .find(plugin => plugin.name === 'node-resolve')
     .resolveId(path.basename(modulePath), path.dirname(modulePath));
+}
+
+function throwException(exception) {
+  throw exception;
 }
 
 module.exports = async function bundle() {
