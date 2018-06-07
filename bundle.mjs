@@ -105,7 +105,12 @@ async function removeESModule(name) {
   const modulesPath = await findESModulesPath();
   rimraf.sync(path.join(modulesPath, name));
   const namespacePath = path.join(modulesPath, path.dirname(name));
-  if (name.startsWith('@') && !fs.readdirSync(namespacePath).length) {
+  if (
+    name.startsWith('@') &&
+    fs.existsSync(namespacePath) &&
+    fs.statSync(namespacePath).isDirectory() &&
+    !fs.readdirSync(namespacePath).length
+  ) {
     fs.rmdirSync(namespacePath);
   }
 }
