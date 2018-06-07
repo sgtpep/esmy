@@ -35,7 +35,9 @@ async function bundleModule(name) {
         },
         plugins: rollupPlugins,
       })
-      .catch(error => console.error(error));
+      .catch(error =>
+        console.error(`Failed to build '${name}': ${error.message}`),
+      );
     if (bundle) {
       await bundle.write({
         file: path.join(esModulePath, 'index.js'),
