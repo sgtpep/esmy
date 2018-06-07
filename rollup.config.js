@@ -6,7 +6,6 @@ import { bin } from './package.json';
 
 export default {
   acorn: { allowHashBang: true },
-  external: ['rollup-plugin-node-builtins', 'rollup-plugin-node-globals'],
   input: './cli.mjs',
   output: {
     file: bin,

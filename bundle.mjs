@@ -2,8 +2,6 @@ import commonJS from 'rollup-plugin-commonjs';
 import findNPMPrefix from 'find-npm-prefix';
 import fs from 'fs';
 import json from 'rollup-plugin-json';
-import nodeBuiltins from 'rollup-plugin-node-builtins';
-import nodeGlobals from 'rollup-plugin-node-globals';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import path from 'path';
 import rimraf from 'rimraf';
@@ -12,8 +10,6 @@ import rollup from 'rollup';
 const rollupPlugins = [
   commonJS(),
   json(),
-  nodeBuiltins(),
-  nodeGlobals(),
   nodeResolve({ jsnext: true }),
 ];
 
