@@ -14,8 +14,8 @@
     "rollup-plugin-node-resolve": "^3.3.0"
   },
   "license": "ISC",
-  "name": "espm",
-  "repository": "https://github.com/sgtpep/espm.git",
+  "name": "esnpm",
+  "repository": "https://github.com/sgtpep/esnpm.git",
   "scripts": {
     "format": "prettier --write './**/*.{css,js,json,md}'",
     "lint": "eslint --fix './**/*.js'",
