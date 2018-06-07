@@ -13,7 +13,9 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-replace": "^2.0.0"
   },
-  "files": ["./dist/cli.js"],
+  "files": [
+    "./dist/cli.js"
+  ],
   "license": "ISC",
   "name": "esnpm",
   "repository": "https://github.com/sgtpep/esnpm.git",
@@ -23,5 +25,5 @@
     "prepublishOnly": "rollup -c",
     "test": "prettier -l './**/*.{css,js,json,jsx,md,mjs}' && eslint './**/*.{js,jsx,mjs}' && node ./test.js"
   },
-  "version": "1.0.2"
+  "version": "1.0.3"
 }
