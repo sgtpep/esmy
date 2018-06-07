@@ -1,3 +1,4 @@
+ignore shebang hack in prettier
 exececutable in node_modules/.bin
 
 package.json: keywords
