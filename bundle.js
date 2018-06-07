@@ -73,24 +73,26 @@ async function findExcessiveESModules(names) {
 }
 
 function findModules(modulesPath) {
-  return fs
-    .readdirSync(modulesPath)
-    .filter(
-      filename =>
-        fs.statSync(path.join(modulesPath, filename)).isDirectory() &&
-        !path.basename(filename).startsWith('.'),
-    )
-    .reduce(
-      (names, name) => [
-        ...names,
-        ...(name.startsWith('@')
-          ? fs
-              .readdirSync(path.join(modulesPath, name))
-              .map(subname => `${name}/${subname}`)
-          : [name]),
-      ],
-      [],
-    );
+  return fs.existsSync(modulesPath) && fs.statSync(modulesPath).isDirectory()
+    ? fs
+        .readdirSync(modulesPath)
+        .filter(
+          filename =>
+            fs.statSync(path.join(modulesPath, filename)).isDirectory() &&
+            !path.basename(filename).startsWith('.'),
+        )
+        .reduce(
+          (names, name) => [
+            ...names,
+            ...(name.startsWith('@')
+              ? fs
+                  .readdirSync(path.join(modulesPath, name))
+                  .map(subname => `${name}/${subname}`)
+              : [name]),
+          ],
+          [],
+        )
+    : [];
 }
 
 async function findModulesPath() {
