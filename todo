@@ -1,4 +1,3 @@
-fix dist/cli.js
 exececutable in node_modules/.bin
 
 package.json: keywords
