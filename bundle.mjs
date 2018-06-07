@@ -7,11 +7,7 @@ import path from 'path';
 import rimraf from 'rimraf';
 import rollup from 'rollup';
 
-const rollupPlugins = [
-  commonJS(),
-  json(),
-  nodeResolve({ jsnext: true }),
-];
+const rollupPlugins = [commonJS(), json(), nodeResolve({ jsnext: true })];
 
 async function bundleModule(name) {
   const esModulePath = path.join(await findESModulesPath(), name);
