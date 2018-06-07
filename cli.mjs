@@ -1,9 +1,10 @@
-#!/usr/bin/env node
-const bundle = require('./bundle');
-const findNPMPrefix = require('find-npm-prefix');
-const fs = require('fs');
-const path = require('path');
-const { execSync, spawnSync } = require('child_process');
+#!/bin/sh 
+':' //#; exec /usr/bin/env node --experimental-modules "$0" "$@"
+import bundle from './bundle';
+import findNPMPrefix from 'find-npm-prefix';
+import fs from 'fs';
+import path from 'path';
+import { execSync, spawnSync } from 'child_process';
 
 async function detectCommand() {
   if (fs.existsSync(await findYarnLockPath())) {
