@@ -1,13 +1,13 @@
-import commonJS from 'rollup-plugin-commonjs';
-import findNPMPrefix from 'find-npm-prefix';
-import fs from 'fs';
-import json from 'rollup-plugin-json';
-import nodeBuiltins from 'rollup-plugin-node-builtins';
-import nodeGlobals from 'rollup-plugin-node-globals';
-import nodeResolve from 'rollup-plugin-node-resolve';
-import path from 'path';
-import rimraf from 'rimraf';
-import rollup from 'rollup';
+const commonJS = require('rollup-plugin-commonjs');
+const findNPMPrefix = require('find-npm-prefix');
+const fs = require('fs');
+const json = require('rollup-plugin-json');
+const nodeBuiltins = require('rollup-plugin-node-builtins');
+const nodeGlobals = require('rollup-plugin-node-globals');
+const nodeResolve = require('rollup-plugin-node-resolve');
+const path = require('path');
+const rimraf = require('rimraf');
+const rollup = require('rollup');
 
 const rollupPlugins = [
   commonJS(),
@@ -20,11 +20,11 @@ const rollupPlugins = [
 async function bundleModule(name) {
   const esModulePath = path.join(await findESModulesPath(), name);
   const versionPath = path.join(esModulePath, '.version');
-  const { version } = JSON.parse(fs.readFileSync(path.join(
+  const { version } = require(path.join(
     await findModulesPath(),
     name,
     'package.json',
-  ), 'utf8'));
+  ));
   if (
     !fs.existsSync(versionPath) ||
     fs.readFileSync(versionPath, 'utf8') !== version
@@ -58,7 +58,7 @@ async function findBundlableModules() {
   const modulesPath = await findModulesPath();
   const packagePath = path.join(await findPrefixPath(), 'package.json');
   return fs.existsSync(packagePath)
-    ? Object.keys(JSON.parse(fs.readFileSync(packagePath, 'utf8')).dependencies || {}).filter(name =>
+    ? Object.keys(require(packagePath).dependencies || {}).filter(name =>
         fs.statSync(path.join(modulesPath, name)).isDirectory(),
       )
     : await findModules(await findModulesPath());
@@ -123,7 +123,7 @@ async function resolveModuleEntry(name) {
     .resolveId(name, await findModulesPath());
 }
 
-export default async function bundle() {
+module.exports = async function bundle() {
   const names = await findBundlableModules();
   for (const name of names) {
     await bundleModule(name);
