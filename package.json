@@ -21,10 +21,10 @@
   "name": "esnpm",
   "repository": "https://github.com/sgtpep/esnpm.git",
   "scripts": {
-    "format": "prettier --write './**/*.{css,js,json,md}'",
-    "lint": "eslint --fix './**/*.js'",
+    "format": "prettier --write './**/*.{css,js,json,jsx,md,mjs}'",
+    "lint": "eslint --fix './**/*.{js,jsx,mjs}'",
     "prepublishOnly": "rollup -c",
-    "test": "prettier -l './**/*.{css,js,json,md}' && eslint './**/*.js' && node ./test.js"
+    "test": "prettier -l './**/*.{css,js,json,jsx,md,mjs}' && eslint './**/*.{js,jsx,mjs}' && node ./test.js"
   },
   "version": "1.0.1"
 }
