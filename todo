@@ -1,11 +1,13 @@
 add shebang to cli.js
 ignore shebang hack in prettier
+allow optional rollup-plugin-node-builtins, rollup-plugin-node-globals
 
 package.json: keywords
 readme
   usage
     cli
     package.json: install, npm, yarn commands
+    optional rollup-plugin-node-builtins, rollup-plugin-node-globals
   take from https://jspm.io/
   link to https://jspm.io/
   limitations
