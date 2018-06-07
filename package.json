@@ -1,6 +1,6 @@
 {
   "author": "Danil Semelenov",
-  "bin": "./dist/cli.js",
+  "bin": "./cli.js",
   "description": "Converts npm packages to native ES6 modules which can be imported directly from browsers without bundlers and transpilers.",
   "devDependencies": {
     "eslint": "^4.19.1",
@@ -13,9 +13,6 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-replace": "^2.0.0"
   },
-  "files": [
-    "./dist"
-  ],
   "license": "ISC",
   "name": "esnpm",
   "repository": "https://github.com/sgtpep/esnpm.git",
