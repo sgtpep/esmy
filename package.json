@@ -3,7 +3,9 @@
   "bin": "./cli.js",
   "description": "Converts npm packages to native ES6 modules which can be imported directly from browsers without bundlers and transpilers.",
   "devDependencies": {
+    "eslint": "^4.19.1",
     "find-npm-prefix": "^1.0.2",
+    "prettier": "^1.13.4",
     "rimraf": "^2.6.2",
     "rollup": "^0.60.0",
     "rollup-plugin-commonjs": "^9.1.3",
@@ -14,5 +16,10 @@
   "license": "ISC",
   "name": "espm",
   "repository": "https://github.com/sgtpep/espm.git",
+  "scripts": {
+    "format": "prettier --write './**/*.{css,js,json,md}'",
+    "lint": "eslint --fix './**/*.js'",
+    "test": "prettier -l './**/*.{css,js,json,md}' && eslint './**/*.js' && node ./test.js"
+  },
   "version": "1.0.0"
 }
