@@ -2,6 +2,7 @@ later
   travis
     badge
   publish bundled version
+    github url
   package.json: keywords
   readme
     usage
