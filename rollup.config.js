@@ -15,6 +15,6 @@ export default {
     commonJS(),
     json(),
     nodeResolve({ module: false, preferBuiltins: true }),
-    replace({ '#!/bin/sh': '', delimeters: ['', ''] }),
+    replace({ '#!/bin/sh': '', delimiters: ['', ''] }),
   ],
 };
