@@ -22,27 +22,30 @@ async function bundleModule(name) {
     !fs.existsSync(versionPath) ||
     fs.readFileSync(versionPath, 'utf8') !== version
   ) {
-    const bundle = await rollup
-      .rollup({
-        input: await resolveModuleEntry(name),
-        onwarn: warning => {
-          throw warning;
-        },
-        plugins: rollupPlugins,
-      })
-      .catch(error =>
-        // eslint-disable-next-line no-console
-        console.error(`Failed to build '${name}': ${error.message}`),
-      );
-    if (bundle) {
-      await bundle.write({
-        file: path.join(esModulePath, 'index.js'),
-        format: 'es',
-        sourcemap: true,
-      });
-      fs.writeFileSync(versionPath, version);
-    } else {
-      await removeESModule(name);
+    const entryPath = await resolveModuleEntry(name);
+    if (inputPath) {
+      const bundle = await rollup
+        .rollup({
+          input: entryPath,
+          onwarn: warning => {
+            throw warning;
+          },
+          plugins: rollupPlugins,
+        })
+        .catch(error =>
+          // eslint-disable-next-line no-console
+          console.error(`Failed to build '${name}': ${error.message}`),
+        );
+      if (bundle) {
+        await bundle.write({
+          file: path.join(esModulePath, 'index.js'),
+          format: 'es',
+          sourcemap: true,
+        });
+        fs.writeFileSync(versionPath, version);
+      } else {
+        await removeESModule(name);
+      }
     }
   }
 }
