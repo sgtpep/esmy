@@ -36,6 +36,7 @@ async function bundleModule(name) {
         plugins: rollupPlugins,
       })
       .catch(error =>
+        // eslint-disable-next-line no-console
         console.error(`Failed to build '${name}': ${error.message}`),
       );
     if (bundle) {
@@ -59,23 +60,6 @@ async function findBundlableModules() {
         fs.statSync(path.join(modulesPath, name)).isDirectory(),
       )
     : await findModules(await findModulesPath());
-}
-
-async function findESModules() {
-  const modulesPath = await findESModulesPath();
-  return fs
-    .readdirSync(modulesPath)
-    .reduce(
-      (names, name) => [
-        ...names,
-        ...(name.startsWith('@')
-          ? fs
-              .readdirSync(path.join(modulesPath, name))
-              .map(subname => `${name}/${subname}`)
-          : [name]),
-      ],
-      [],
-    );
 }
 
 async function findESModulesPath() {
