@@ -68,7 +68,10 @@ async function detectDependencies() {
 }
 
 async function detectExcessiveESPackages() {
-  const names = await listPackages(await findPackagesPath());
+  const dependencies = await detectDependencies();
+  const names = dependencies.length
+    ? dependencies
+    : await listPackages(await findPackagesPath());
   return (await listPackages(await findESPackagesPath())).filter(
     name => !names.includes(name),
   );

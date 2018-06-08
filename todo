@@ -1,5 +1,3 @@
-build missing es modules from dependencies
-remove es packages not in dependencies else not in node_modules
 allow optional rollup-plugin-node-builtins, rollup-plugin-node-globals
 
 unpublish esnpm
