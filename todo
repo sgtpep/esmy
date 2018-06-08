@@ -1,4 +1,8 @@
-esmy, esmer
+esmy
+  travis
+  remove old npm package
+  publish new npm package
+
 test.mjs
   empty
 .npmignore

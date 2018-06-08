@@ -14,8 +14,8 @@
     "rollup-plugin-replace": "^2.0.0"
   },
   "license": "ISC",
-  "name": "esnpm",
-  "repository": "https://github.com/sgtpep/esnpm.git",
+  "name": "esmy",
+  "repository": "https://github.com/sgtpep/esmy.git",
   "scripts": {
     "format": "prettier --write './**/*.{css,js,json,jsx,md,mjs}'",
     "lint": "eslint --fix './**/*.{js,jsx,mjs}'",
