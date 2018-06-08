@@ -1,6 +1,5 @@
 allow optional rollup-plugin-node-builtins, rollup-plugin-node-globals
 
-unpublish esnpm
 package.json: keywords
 readme
   usage
