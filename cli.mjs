@@ -1,4 +1,4 @@
-import bundle from './bundle';
+import build from './build';
 import findNPMPrefix from 'find-npm-prefix';
 import fs from 'fs';
 import path from 'path';
@@ -32,7 +32,7 @@ async function main() {
       process.exit(status);
     }
   }
-  await bundle(args);
+  await build(args);
 }
 
 main();

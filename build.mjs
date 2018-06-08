@@ -10,7 +10,7 @@ import rollup from 'rollup';
 
 const rollupPlugins = [commonJS(), json(), nodeResolve({ jsnext: true })];
 
-async function bundlePackage(name) {
+async function buildPackage(name) {
   const esPackagePath = path.join(await findESPackagesPath(), name);
   const versionPath = path.join(esPackagePath, '.version');
   const { version } = JSON.parse(
@@ -146,9 +146,9 @@ async function resolvePackageEntry(name) {
     .resolveId(name, await findPackagesPath());
 }
 
-export default async function bundle(args) {
+export default async function build(args) {
   for (const name of await detectBundlablePackages(args)) {
-    await bundlePackage(name);
+    await buildPackage(name);
   }
   for (const name of await detectExcessiveESPackages()) {
     await removeESPackage(name);
