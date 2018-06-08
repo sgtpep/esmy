@@ -1,6 +1,4 @@
 esmy
-  travis
-  remove old npm package
   publish new npm package
 
 test.mjs
@@ -17,6 +15,7 @@ install bundle only installed packages or ones from package.json
 install package by default
 allow optional rollup-plugin-node-builtins, rollup-plugin-node-globals
 
+unpublish esnpm
 package.json: keywords
 readme
   usage
