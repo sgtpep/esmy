@@ -23,7 +23,7 @@ async function bundleModule(name) {
     fs.readFileSync(versionPath, 'utf8') !== version
   ) {
     const entryPath = await resolveModuleEntry(name);
-    if (inputPath) {
+    if (entryPath) {
       const bundle = await rollup
         .rollup({
           input: entryPath,
