@@ -8,6 +8,7 @@ export default {
   acorn: { allowHashBang: true },
   input: './cli.mjs',
   output: {
+    banner: '#!/usr/bin/env node',
     file: bin,
     format: 'cjs',
   },
