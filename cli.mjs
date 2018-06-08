@@ -1,5 +1,3 @@
-#!/bin/sh
-':'; //#; exec /usr/bin/env node --experimental-modules "$0" "$@"
 import bundle from './bundle';
 import findNPMPrefix from 'find-npm-prefix';
 import fs from 'fs';
