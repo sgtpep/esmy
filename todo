@@ -1,6 +1,5 @@
-install bundle only installed packages or ones from package.json
-  https://github.com/npm/npm-package-arg
-install package by default
+build missing es modules from dependencies
+remove es packages not in dependencies else not in node_modules
 allow optional rollup-plugin-node-builtins, rollup-plugin-node-globals
 
 unpublish esnpm

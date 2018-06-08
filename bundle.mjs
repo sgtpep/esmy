@@ -3,18 +3,19 @@ import findNPMPrefix from 'find-npm-prefix';
 import fs from 'fs';
 import json from 'rollup-plugin-json';
 import nodeResolve from 'rollup-plugin-node-resolve';
+import npmPackageArg from 'npm-package-arg';
 import path from 'path';
 import rimraf from 'rimraf';
 import rollup from 'rollup';
 
 const rollupPlugins = [commonJS(), json(), nodeResolve({ jsnext: true })];
 
-async function bundleModule(name) {
-  const esModulePath = path.join(await findESModulesPath(), name);
-  const versionPath = path.join(esModulePath, '.version');
+async function bundlePackage(name) {
+  const esPackagePath = path.join(await findESPackagesPath(), name);
+  const versionPath = path.join(esPackagePath, '.version');
   const { version } = JSON.parse(
     fs.readFileSync(
-      path.join(await findModulesPath(), name, 'package.json'),
+      path.join(await findPackagesPath(), name, 'package.json'),
       'utf8',
     ),
   );
@@ -22,78 +23,75 @@ async function bundleModule(name) {
     !fs.existsSync(versionPath) ||
     fs.readFileSync(versionPath, 'utf8') !== version
   ) {
-    const entryPath = await resolveModuleEntry(name);
+    const entryPath = await resolvePackageEntry(name);
     if (entryPath) {
-      const bundle = await rollup
-        .rollup({
+      try {
+        var bundle = await rollup.rollup({
           input: entryPath,
           onwarn: warning => {
             throw warning;
           },
           plugins: rollupPlugins,
-        })
-        .catch(error =>
-          // eslint-disable-next-line no-console
-          console.error(`Failed to build '${name}': ${error.message}`),
-        );
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`Failed to build '${name}': ${error.message}`);
+      }
       if (bundle) {
         await bundle.write({
-          file: path.join(esModulePath, 'index.js'),
+          file: path.join(esPackagePath, 'index.js'),
           format: 'es',
           sourcemap: true,
         });
         fs.writeFileSync(versionPath, version);
       } else {
-        await removeESModule(name);
+        await removeESPackage(name);
       }
     }
   }
 }
 
-async function findBundlableModules() {
-  const modulesPath = await findModulesPath();
-  const packagePath = path.join(await findPrefixPath(), 'package.json');
-  return fs.existsSync(packagePath)
+async function detectBundlablePackages(args) {
+  return args.length ? filterPackageArgs(args) : detectDependencies();
+}
+
+async function detectDependencies() {
+  const manifestPath = path.join(await findPrefixPath(), 'package.json');
+  const packagesPath = await findPackagesPath();
+  return fs.existsSync(manifestPath)
     ? Object.keys(
-        JSON.parse(fs.readFileSync(packagePath, 'utf8')).dependencies || {},
-      ).filter(name => fs.statSync(path.join(modulesPath, name)).isDirectory())
-    : await findModules(await findModulesPath());
+        JSON.parse(fs.readFileSync(manifestPath, 'utf8')).dependencies || {},
+      ).filter(name =>
+        fs.existsSync(path.join(packagesPath, name, 'package.json')),
+      )
+    : [];
 }
 
-async function findESModulesPath() {
-  return path.join(await findPrefixPath(), 'es_modules');
-}
-
-async function findExcessiveESModules(names) {
-  return (await findModules(await findESModulesPath())).filter(
+async function detectExcessiveESPackages() {
+  const names = await listPackages(await findPackagesPath());
+  return (await listPackages(await findESPackagesPath())).filter(
     name => !names.includes(name),
   );
 }
 
-function findModules(modulesPath) {
-  return fs.existsSync(modulesPath) && fs.statSync(modulesPath).isDirectory()
-    ? fs
-        .readdirSync(modulesPath)
-        .filter(
-          filename =>
-            fs.statSync(path.join(modulesPath, filename)).isDirectory() &&
-            !path.basename(filename).startsWith('.'),
-        )
-        .reduce(
-          (names, name) => [
-            ...names,
-            ...(name.startsWith('@')
-              ? fs
-                  .readdirSync(path.join(modulesPath, name))
-                  .map(subname => `${name}/${subname}`)
-              : [name]),
-          ],
-          [],
-        )
-    : [];
+function filterPackageArgs(args) {
+  return args
+    .map(arg => {
+      try {
+        var { name } = npmPackageArg(arg);
+      } catch (error) {
+        return;
+      }
+      return name;
+    })
+    .filter(Boolean);
 }
 
-async function findModulesPath() {
+async function findESPackagesPath() {
+  return path.join(await findPrefixPath(), 'es_modules');
+}
+
+async function findPackagesPath() {
   return path.join(await findPrefixPath(), 'node_modules');
 }
 
@@ -104,32 +102,55 @@ async function findPrefixPath() {
   return findPrefixPath.prefixPath;
 }
 
-async function removeESModule(name) {
-  const modulesPath = await findESModulesPath();
-  rimraf.sync(path.join(modulesPath, name));
-  const namespacePath = path.join(modulesPath, path.dirname(name));
-  if (
-    name.startsWith('@') &&
-    fs.existsSync(namespacePath) &&
-    fs.statSync(namespacePath).isDirectory() &&
-    !fs.readdirSync(namespacePath).length
-  ) {
-    fs.rmdirSync(namespacePath);
+async function listPackages(packagesPath) {
+  return fs.existsSync(packagesPath) && fs.statSync(packagesPath).isDirectory()
+    ? fs
+        .readdirSync(packagesPath)
+        .filter(
+          filename =>
+            !filename.startsWith('.') &&
+            fs.statSync(path.join(packagesPath, filename)).isDirectory(),
+        )
+        .reduce(
+          (names, name) => [
+            ...names,
+            ...(name.startsWith('@')
+              ? fs
+                  .readdirSync(path.join(packagesPath, name))
+                  .map(subname => `${name}/${subname}`)
+              : [name]),
+          ],
+          [],
+        )
+    : [];
+}
+
+async function removeESPackage(name) {
+  const packagesPath = await findESPackagesPath();
+  rimraf.sync(path.join(packagesPath, name));
+  if (name.startsWith('@')) {
+    const namespacePath = path.join(packagesPath, path.dirname(name));
+    if (
+      fs.existsSync(namespacePath) &&
+      fs.statSync(namespacePath).isDirectory() &&
+      !fs.readdirSync(namespacePath).length
+    ) {
+      fs.rmdirSync(namespacePath);
+    }
   }
 }
 
-async function resolveModuleEntry(name) {
+async function resolvePackageEntry(name) {
   return rollupPlugins
     .find(plugin => plugin.name === 'node-resolve')
-    .resolveId(name, await findModulesPath());
+    .resolveId(name, await findPackagesPath());
 }
 
-export default async function bundle() {
-  const names = await findBundlableModules();
-  for (const name of names) {
-    await bundleModule(name);
+export default async function bundle(args) {
+  for (const name of await detectBundlablePackages(args)) {
+    await bundlePackage(name);
   }
-  for (const name of await findExcessiveESModules(names)) {
-    await removeESModule(name);
+  for (const name of await detectExcessiveESPackages()) {
+    await removeESPackage(name);
   }
 }

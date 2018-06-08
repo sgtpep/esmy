@@ -22,16 +22,17 @@ async function detectCommand() {
 }
 
 async function main() {
+  const args = process.argv.slice(2);
   if (process.argv.length > 2) {
-    const [command, ...args] = await detectCommand();
-    const { status } = spawnSync(command, [...args, ...process.argv.slice(2)], {
+    const [command, ...commandArgs] = await detectCommand();
+    const { status } = spawnSync(command, [...commandArgs, ...args], {
       stdio: 'inherit',
     });
     if (status) {
       process.exit(status);
     }
   }
-  await bundle();
+  await bundle(args);
 }
 
 main();
