@@ -5,25 +5,26 @@ import path from 'path';
 import { execSync, spawnSync } from 'child_process';
 
 async function detectCommand() {
-  if (fs.existsSync(await findYarnLockPath())) {
-    return 'yarn';
+  if (
+    fs.existsSync(path.join(await findNPMPrefix(process.cwd()), 'yarn.lock'))
+  ) {
+    return ['yarn', 'add'];
   } else {
+    const command =
+      process.platform === 'win32' ? 'where yarn' : 'command -v yarn';
     try {
-      execSync(process.platform === 'win32' ? 'where yarn' : 'command -v yarn');
+      execSync(command);
     } catch (error) {
-      return 'npm';
+      return ['npm', 'install'];
     }
-    return 'yarn';
+    return ['yarn', 'add'];
   }
-}
-
-async function findYarnLockPath() {
-  return path.join(await findNPMPrefix(process.cwd()), 'yarn.lock');
 }
 
 async function main() {
   if (process.argv.length > 2) {
-    spawnSync(await detectCommand(), process.argv.slice(2), {
+    const [command, ...args] = await detectCommand();
+    spawnSync(command, [...args, ...process.argv.slice(2)], {
       stdio: 'inherit',
     });
   }
