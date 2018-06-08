@@ -1,6 +1,3 @@
-.npmignore
-  .mjs, rollup.config.js
-  todo
 add shebang to cli.js
 ignore shebang hack in prettier
 check rollup output
