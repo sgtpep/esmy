@@ -1,9 +1,12 @@
-allow optional rollup-plugin-node-builtins, rollup-plugin-node-globals
+create-esmy
+  license
+  readme
+  try
 
 package.json: keywords
 readme
   usage
-    npx
+    npx esmy, yarn create esmy
     npm/yarn, ./node_modules/.bin/*
     cli
     package.json: install, npm, yarn commands
@@ -17,6 +20,7 @@ readme
     duplication
     strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
   inspired by jspm.io
+publish 1.1.0
 
 future
   tests
