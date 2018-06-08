@@ -24,9 +24,12 @@ async function detectCommand() {
 async function main() {
   if (process.argv.length > 2) {
     const [command, ...args] = await detectCommand();
-    spawnSync(command, [...args, ...process.argv.slice(2)], {
+    const { status } = spawnSync(command, [...args, ...process.argv.slice(2)], {
       stdio: 'inherit',
     });
+    if (status) {
+      process.exit(status);
+    }
   }
   await bundle();
 }
