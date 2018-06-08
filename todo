@@ -1,7 +1,3 @@
-add shebang to cli.js
-ignore shebang hack in prettier
-check rollup output
-
 install bundle only installed packages or ones from package.json
   https://github.com/npm/npm-package-arg
 install package by default
