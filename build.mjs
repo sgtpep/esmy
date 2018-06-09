@@ -9,30 +9,35 @@ import replace from 'rollup-plugin-replace';
 import rimraf from 'rimraf';
 import rollup from 'rollup';
 
+const defaultEnv = 'development';
+
 const rollupPlugins = [
   commonJS(),
   json(),
   nodeResolve({ jsnext: true }),
   replace({
-    'process.env.NODE_ENV': JSON.stringify(
-      process.env.NODE_ENV || 'development',
-    ),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || defaultEnv),
   }),
 ];
 
 async function buildPackage(name) {
-  const esPackagePath = path.join(await findESPackagesPath(), name);
-  const versionPath = path.join(esPackagePath, '.version');
-  const { version } = JSON.parse(
+  const packagePath = path.join(await findESPackagesPath(), name);
+  const versionPath = path.join(packagePath, '.version');
+  const version = fs.existsSync(versionPath)
+    ? fs.readFileSync(versionPath, 'utf8')
+    : '';
+  const requiredVersion = JSON.parse(
     fs.readFileSync(
       path.join(await findPackagesPath(), name, 'package.json'),
       'utf8',
     ),
-  );
-  if (
-    !fs.existsSync(versionPath) ||
-    fs.readFileSync(versionPath, 'utf8') !== version
-  ) {
+  ).version;
+  const envPath = path.join(packagePath, '.node_env');
+  const env = fs.existsSync(envPath)
+    ? fs.readFileSync(envPath, 'utf8')
+    : defaultEnv;
+  const requiredEnv = process.env.NODE_ENV || defaultEnv;
+  if (version !== requiredVersion || env !== requiredEnv) {
     const entryPath = await resolvePackageEntry(name);
     if (entryPath) {
       try {
@@ -57,11 +62,14 @@ async function buildPackage(name) {
       }
       if (bundle) {
         await bundle.write({
-          file: path.join(esPackagePath, 'index.js'),
+          file: path.join(packagePath, 'index.js'),
           format: 'es',
           sourcemap: true,
         });
         fs.writeFileSync(versionPath, version);
+        requiredEnv === defaultEnv
+          ? rimraf.sync(envPath)
+          : fs.writeFileSync(envPath, requiredEnv);
       } else {
         await removeESPackage(name);
       }
