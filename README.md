@@ -76,3 +76,10 @@ NODE_ENV=production esmy react
 ```
 
 Some npm packages use the [Node.js](https://nodejs.org/) [standard library](https://nodejs.org/api/index.html) which is not available in browsers and needs to be polyfilled. To make `esmy` build them install npm packages `rollup-plugin-node-builtins` and `rollup-plugin-node-globals` as development dependencies and run `esmy` locally which will use these plugins on build. Note that not all standard Node.js modules can be polyfilled, see (rollup-plugin-node-builtins's readme)(https://github.com/calvinmetcalf/rollup-plugin-node-builtins/blob/master/readme.md) for details.
+
+## Limitations
+
+- npm modules can export only default exports which `rollup-plugin-commonjs` (used under the hood of `esmy`) can convert to named ones most of the times. But sometimes it's not possible, see [here](https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports).
+- ES6 modules implies operating in strict mode (like one you get with `'use strict';`). Some npm modules use non-strict (aka lousy mode) and may fail in strict mode. Therefore they can't be converted to ES6 modules without rewriting original npm modules, see [here](https://github.com/rollup/rollup-plugin-commonjs#strict-mode).
+- At the moment it's not possible to import submodules. E.g. it's a known issue for the `rxjs` package which exposes its API not only from an entry package module (`require('rxjs')`) but also from its submodules (`require('rxjs/operators')`). It may be addressed in next `esmy` versions.
+- At the moment if npm packages depend on each other (e.g. `react-dom` depends on `react`) but they all need to be imported in a project, than you may expect some code duplication in compiled ES6 packages (`react-dom` will include a copy of `react`) because of how bundling currently works. It may be addressed in next `esmy` versions.

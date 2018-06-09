@@ -1,16 +1,5 @@
-how it works
-  npm packages
-  rollup
-limitations
-  named exports
-    https://github.com/jspm/project/issues/38
-    https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports
-  duplication
-  strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
-  import { map } from 'rxjs/operators'
-
 grammarly
 publish 1.1.1
-
 extract react from react-dom
-  use as examples in readme
+
+try https://github.com/nolanlawson/cjs-to-es6
