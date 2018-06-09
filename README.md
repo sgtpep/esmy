@@ -17,7 +17,13 @@ console.log(React);
 
 ## Why
 
-TODO
+All modern browsers now [support](https://caniuse.com/#feat=es6-module) importing ES6 modules within `<script type="module">`. They also support most of other ES6+ features. So it makes feasable to get rid of the bloat of bundlers and transpilers at least during development.
+
+Also it's tempting to use the [npm](https://www.npmjs.com/) package registry as the largest source of third-party JavaScript code. But at the moment of writing most of its packages are provided in the CommonJS format which is incompatible with ES6 modules. Although some of them are distributed as ES6 modules as well, package authors assume that they will be used in conjunction with bundles like [webpack](https://webpack.js.org/) which are not strictly compatible with browsers' implementation of ES6 modules (e.g. extensions in `import`s may be ommitted: `import './foo'`, or there may be 'unqualified' imports from `node_modules` or Node.js packages: `import 'foo'`, etc.)
+
+`esmy` solves this problem trying to build browser-compatible ES6 modules from npm packages on install time with the help of the [Rollup](https://rollupjs.org/guide/en) bundler.
+
+This project was inspired by [jspm.io](https://jspm.io/) (not to be confused with the seemed to be obsolete [jspm](https://jspm.org/) package manager) which provides CDN for browser-compatible ES6 modules compiled from npm packages.
 
 ## Usage
 
