@@ -1,7 +1,6 @@
-take from https://jspm.io/
-link to https://jspm.io/
-inspired by jspm.io
-
+how it works
+  npm packages
+  rollup
 limitations
   named exports
     https://github.com/jspm/project/issues/38
@@ -9,13 +8,6 @@ limitations
   duplication
   strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
   import { map } from 'rxjs/operators'
-
-why
-  commonjs
-  heavyweight webpack
-how it works
-  npm packages
-  rollup
 
 grammarly
 publish 1.1.1
