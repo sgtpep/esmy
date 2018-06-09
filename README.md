@@ -6,13 +6,13 @@
 
 Converts npm packages to native [ES6 modules](http://exploringjs.com/es6/ch_modules.html) which can be imported directly from browsers without bundlers and transpilers.
 
-For example, to install the `hyperscript` package as a browser-compatible ES6 module run this command: `npx esmy hyperscript`, or: `yarn create esmy hyperscript`. The file `./es_modules/hyperscript/index.js` will be created. Modern browsers can import it like this:
+For example, to install the `react` package as a browser-compatible ES6 module run this command: `npx esmy react`, or: `yarn create esmy react`. The file `./es_modules/react/index.js` will be created. Modern browsers can import it like this:
 
 ```html
 <!doctype html>
 <script type="module">
-import h from './es_modules/hyperscript/index.js';
-console.log(h('.foo', {'data-bar': 'baz'}, 'qux'));
+import React from './es_modules/react/index.js';
+console.log(React);
 </script>
 ```
 
