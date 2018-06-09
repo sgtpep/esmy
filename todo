@@ -20,7 +20,7 @@ readme
     duplication
     strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
   inspired by jspm.io
-publish 1.1.0
+publish 1.1.1
 
 future
   tests
