@@ -26,13 +26,12 @@ async function buildPackage(name) {
     const entryPath = await resolvePackageEntry(name);
     if (entryPath) {
       try {
-        var plugins = [
-          ...rollupPlugins,
-          await import('rollup-plugin-node-builtins'),
-          await import('rollup-plugin-node-globals'),
+        var optionalPlugins = [
+          require('rollup-plugin-node-builtins'),
+          require('rollup-plugin-node-globals'),
         ];
       } catch (error) {
-        plugins = rollupPlugins;
+        optionalPlugins = [];
       }
       try {
         var bundle = await rollup.rollup({
@@ -40,7 +39,7 @@ async function buildPackage(name) {
           onwarn: warning => {
             throw warning;
           },
-          plugins,
+          plugins: [...rollupPlugins, ...optionalPlugins],
         });
       } catch (error) {
         // eslint-disable-next-line no-console
