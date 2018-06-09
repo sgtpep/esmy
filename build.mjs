@@ -5,10 +5,20 @@ import json from 'rollup-plugin-json';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import npmPackageArg from 'npm-package-arg';
 import path from 'path';
+import replace from 'rollup-plugin-replace';
 import rimraf from 'rimraf';
 import rollup from 'rollup';
 
-const rollupPlugins = [commonJS(), json(), nodeResolve({ jsnext: true })];
+const rollupPlugins = [
+  commonJS(),
+  json(),
+  nodeResolve({ jsnext: true }),
+  replace({
+    'process.env.NODE_ENV': JSON.stringify(
+      process.env.NODE_ENV || 'development',
+    ),
+  }),
+];
 
 async function buildPackage(name) {
   const esPackagePath = path.join(await findESPackagesPath(), name);

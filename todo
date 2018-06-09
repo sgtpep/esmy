@@ -1,9 +1,12 @@
+try process.env.NODE_ENV
+
 usage
   cli
     npx esmy, yarn create esmy
     npm/yarn, ./node_modules/.bin/*
   package.json: install, npm, yarn commands
   optional rollup-plugin-node-builtins, rollup-plugin-node-globals
+NODE_ENV: process.env.NODE_ENV
 take from https://jspm.io/
 link to https://jspm.io/
 limitations
