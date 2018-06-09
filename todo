@@ -1,18 +1,18 @@
-package.json: keywords
-readme
-  usage
+usage
+  cli
     npx esmy, yarn create esmy
     npm/yarn, ./node_modules/.bin/*
-    cli
-    package.json: install, npm, yarn commands
-    optional rollup-plugin-node-builtins, rollup-plugin-node-globals
-  take from https://jspm.io/
-  link to https://jspm.io/
-  limitations
-    named exports
-      https://github.com/jspm/project/issues/38
-      https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports
-    duplication
-    strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
-  inspired by jspm.io
+  package.json: install, npm, yarn commands
+  optional rollup-plugin-node-builtins, rollup-plugin-node-globals
+take from https://jspm.io/
+link to https://jspm.io/
+limitations
+  named exports
+    https://github.com/jspm/project/issues/38
+    https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports
+  duplication
+  strict mode https://github.com/rollup/rollup-plugin-commonjs#strict-mode
+inspired by jspm.io
+
+grammarly
 publish 1.1.1
