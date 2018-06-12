@@ -62,7 +62,7 @@ async function buildPackage(name) {
         ),
         sourcemap: true,
       });
-      fs.writeFileSync(versionPath, version);
+      fs.writeFileSync(versionPath, requiredVersion);
       requiredEnv === defaultEnv
         ? rimraf.sync(envPath)
         : fs.writeFileSync(envPath, requiredEnv);
