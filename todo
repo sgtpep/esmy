@@ -1,6 +1,0 @@
-try experimentalDynamicImport
-  add rollup-plugin-node-builtins, rollup-plugin-node-globals
-    update readme
-try experimentalCodeSplitting to resolve duplication
-extract react from react-dom
-try https://github.com/nolanlawson/cjs-to-es6

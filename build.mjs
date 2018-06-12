@@ -10,6 +10,7 @@ import rimraf from 'rimraf';
 import rollup from 'rollup';
 
 const defaultEnv = 'development';
+const externalPackages = ['jquery', 'react'];
 
 const rollupPlugins = [
   commonJS(),
@@ -49,11 +50,16 @@ async function buildPackage(name) {
         optionalPlugins = [];
       }
       await (await rollup.rollup({
+        external: externalPackages,
         input: entryPath,
         plugins: [...rollupPlugins, ...optionalPlugins],
       })).write({
         file: path.join(packagePath, 'index.js'),
         format: 'es',
+        paths: externalPackages.reduce(
+          (paths, name) => ({ ...paths, [name]: `../${name}/index.js` }),
+          {},
+        ),
         sourcemap: true,
       });
       fs.writeFileSync(versionPath, version);
