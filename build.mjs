@@ -48,31 +48,18 @@ async function buildPackage(name) {
       } catch (error) {
         optionalPlugins = [];
       }
-      try {
-        var bundle = await rollup.rollup({
-          input: entryPath,
-          onwarn: warning => {
-            throw warning;
-          },
-          plugins: [...rollupPlugins, ...optionalPlugins],
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(`Failed to build '${name}': ${error.message}`);
-      }
-      if (bundle) {
-        await bundle.write({
-          file: path.join(packagePath, 'index.js'),
-          format: 'es',
-          sourcemap: true,
-        });
-        fs.writeFileSync(versionPath, version);
-        requiredEnv === defaultEnv
-          ? rimraf.sync(envPath)
-          : fs.writeFileSync(envPath, requiredEnv);
-      } else {
-        await removeESPackage(name);
-      }
+      await (await rollup.rollup({
+        input: entryPath,
+        plugins: [...rollupPlugins, ...optionalPlugins],
+      })).write({
+        file: path.join(packagePath, 'index.js'),
+        format: 'es',
+        sourcemap: true,
+      });
+      fs.writeFileSync(versionPath, version);
+      requiredEnv === defaultEnv
+        ? rimraf.sync(envPath)
+        : fs.writeFileSync(envPath, requiredEnv);
     }
   }
 }
