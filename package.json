@@ -34,5 +34,5 @@
     "prepublishOnly": "rollup -c",
     "test": "prettier -l './**/*.{css,js,json,jsx,md,mjs}' && eslint './**/*.{js,jsx,mjs}' && node ./test.js"
   },
-  "version": "1.1.1"
+  "version": "1.2.0"
 }
