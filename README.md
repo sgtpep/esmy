@@ -1,8 +1,6 @@
 # esmy
 
-[![Build Status](https://travis-ci.com/sgtpep/esmy.svg)](https://travis-ci.com/sgtpep/esmy)
-[![npm Package](https://img.shields.io/npm/v/esmy.svg?colorB=44cc11)](https://www.npmjs.com/package/esmy)
-[![License](https://img.shields.io/badge/license-ISC-brightgreen.svg)](https://opensource.org/licenses/ISC)
+[![Build Status](https://travis-ci.com/sgtpep/esmy.svg?branch=master)](https://travis-ci.com/sgtpep/esmy)
 
 Converts npm packages to native [ES6 modules](http://exploringjs.com/es6/ch_modules.html) which can be imported directly from modern browsers without bundlers and transpilers.
 
