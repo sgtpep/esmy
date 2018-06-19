@@ -150,7 +150,7 @@ function listPackages(packagesPath, es = false) {
 async function parseESPackageVersion(name) {
   const packagePath = await findESPackagePath(name);
   return fs.existsSync(packagePath)
-    ? new Promise((resolve, reject) => {
+    ? new Promise(resolve => {
         let firstLine;
         const stream = readline.createInterface({
           input: fs.createReadStream(packagePath),
