@@ -5,6 +5,7 @@ import json from 'rollup-plugin-json';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import npmPackageArg from 'npm-package-arg';
 import path from 'path';
+import readline from 'readline';
 import replace from 'rollup-plugin-replace';
 import rimraf from 'rimraf';
 import rollup from 'rollup';
@@ -17,28 +18,17 @@ const rollupPlugins = [
   json(),
   nodeResolve({ jsnext: true }),
   replace({
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || defaultEnv),
+    'process.env.NODE_ENV': JSON.stringify(getEnv()),
   }),
 ];
 
 async function buildPackage(name) {
-  const packagePath = path.join(await findESPackagesPath(), name);
-  const versionPath = path.join(packagePath, '.version');
-  const version = fs.existsSync(versionPath)
-    ? fs.readFileSync(versionPath, 'utf8')
-    : '';
-  const requiredVersion = JSON.parse(
-    fs.readFileSync(
-      path.join(await findPackagesPath(), name, 'package.json'),
-      'utf8',
-    ),
-  ).version;
-  const envPath = path.join(packagePath, '.node_env');
-  const env = fs.existsSync(envPath)
-    ? fs.readFileSync(envPath, 'utf8')
-    : defaultEnv;
-  const requiredEnv = process.env.NODE_ENV || defaultEnv;
-  if (version !== requiredVersion || env !== requiredEnv) {
+  const [packageVersion, packageEnv] = await parseESPackageVersion(name);
+  const { version } = JSON.parse(
+    fs.readFileSync(await findPackageManifestPath(name), 'utf8'),
+  );
+  const env = getEnv();
+  if (packageVersion !== version || packageEnv !== env) {
     const entryPath = await resolvePackageEntry(name);
     if (entryPath) {
       try {
@@ -54,7 +44,8 @@ async function buildPackage(name) {
         input: entryPath,
         plugins: [...rollupPlugins, ...optionalPlugins],
       })).write({
-        file: path.join(packagePath, 'index.js'),
+        banner: `/* version ${version} ${env} */`,
+        file: await findESPackagePath(name),
         format: 'es',
         paths: externalPackages.reduce(
           (paths, name) => ({ ...paths, [name]: `../${name}/index.js` }),
@@ -62,10 +53,6 @@ async function buildPackage(name) {
         ),
         sourcemap: true,
       });
-      fs.writeFileSync(versionPath, requiredVersion);
-      requiredEnv === defaultEnv
-        ? rimraf.sync(envPath)
-        : fs.writeFileSync(envPath, requiredEnv);
     }
   }
 }
@@ -76,13 +63,10 @@ async function detectBundlablePackages(args) {
 
 async function detectDependencies() {
   const manifestPath = path.join(await findPrefixPath(), 'package.json');
-  const packagesPath = await findPackagesPath();
   return fs.existsSync(manifestPath)
     ? Object.keys(
         JSON.parse(fs.readFileSync(manifestPath, 'utf8')).dependencies || {},
-      ).filter(name =>
-        fs.existsSync(path.join(packagesPath, name, 'package.json')),
-      )
+      ).filter(async name => fs.existsSync(await findPackageManifestPath(name)))
     : [];
 }
 
@@ -91,7 +75,7 @@ async function detectExcessiveESPackages() {
   const names = dependencies.length
     ? dependencies
     : await listPackages(await findPackagesPath());
-  return (await listPackages(await findESPackagesPath())).filter(
+  return (await listPackages(await findESPackagesPath(), true)).filter(
     name => !names.includes(name),
   );
 }
@@ -109,8 +93,16 @@ function filterPackageArgs(args) {
     .filter(Boolean);
 }
 
+async function findESPackagePath(name) {
+  return path.join(await findESPackagesPath(), `${name}.js`);
+}
+
 async function findESPackagesPath() {
   return path.join(await findPrefixPath(), 'es_modules');
+}
+
+async function findPackageManifestPath(name) {
+  return path.join(await findPackagesPath(), name, 'package.json');
 }
 
 async function findPackagesPath() {
@@ -124,36 +116,63 @@ async function findPrefixPath() {
   return findPrefixPath.prefixPath;
 }
 
-async function listPackages(packagesPath) {
+function getEnv() {
+  return process.env.NODE_ENV || defaultEnv;
+}
+
+function listPackages(packagesPath, es = false) {
   return fs.existsSync(packagesPath) && fs.statSync(packagesPath).isDirectory()
     ? fs
         .readdirSync(packagesPath)
-        .filter(
-          filename =>
-            !filename.startsWith('.') &&
-            fs.statSync(path.join(packagesPath, filename)).isDirectory(),
-        )
         .reduce(
-          (names, name) => [
+          (names, filename) => [
             ...names,
-            ...(name.startsWith('@')
-              ? fs
-                  .readdirSync(path.join(packagesPath, name))
-                  .map(subname => `${name}/${subname}`)
-              : [name]),
+            ...(filename.startsWith('@')
+              ? listPackages(path.join(packagesPath, filename), es).map(
+                  name => `${filename}/${name}${es ? '.js' : ''}`,
+                )
+              : [filename]),
           ],
           [],
         )
+        .filter(name => {
+          const packagePath = path.join(packagesPath, name);
+          return es
+            ? fs.statSync(packagePath).isFile() &&
+                path.extname(packagePath) === '.js'
+            : fs.statSync(packagePath).isDirectory() &&
+                fs.existsSync(path.join(packagePath, 'package.json'));
+        })
+        .map(name => (es ? name.replace(/\.js$/, '') : name))
     : [];
 }
 
+async function parseESPackageVersion(name) {
+  const packagePath = await findESPackagePath(name);
+  return fs.existsSync(packagePath)
+    ? new Promise((resolve, reject) => {
+        let firstLine;
+        const stream = readline.createInterface({
+          input: fs.createReadStream(packagePath),
+        });
+        stream.on('close', () =>
+          resolve(firstLine.match(/^\/\* version (.+?) (.+?) \*\/$/).slice(1)),
+        );
+        stream.on('line', line => {
+          firstLine = line;
+          stream.close();
+        });
+      })
+    : ['', defaultEnv];
+}
+
 async function removeESPackage(name) {
-  const packagesPath = await findESPackagesPath();
-  rimraf.sync(path.join(packagesPath, name));
+  const packagePath = await findESPackagePath(name);
+  rimraf.sync(packagePath);
+  rimraf.sync(`${packagePath}.map`);
   if (name.startsWith('@')) {
-    const namespacePath = path.join(packagesPath, path.dirname(name));
+    const namespacePath = path.dirname(packagePath);
     if (
-      fs.existsSync(namespacePath) &&
       fs.statSync(namespacePath).isDirectory() &&
       !fs.readdirSync(namespacePath).length
     ) {

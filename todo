@@ -1,7 +1,5 @@
-es_modules/foo/index.js -> es_modules/foo.js
-  update readme
-  replace .version, .env with /*...*/
-  remove on package remove
 submodules: snabbdom, , rxjs/operators, rxjs/ajax
+  remove es_modules/*/ before bundling
   remove on package remove
   update readme
+publish
