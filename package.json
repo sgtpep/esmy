@@ -32,7 +32,7 @@
     "format": "prettier --write './**/*.{css,js,json,jsx,md,mjs}'",
     "lint": "eslint --fix './**/*.{js,jsx,mjs}'",
     "prepublishOnly": "rollup -c",
-    "test": "prettier -l './**/*.{css,js,json,jsx,md,mjs}' && eslint './**/*.{js,jsx,mjs}' && node ./test.js"
+    "test": "prettier -l './**/*.{css,js,json,jsx,md,mjs}' && eslint './**/*.{js,jsx,mjs}'"
   },
   "version": "1.2.0"
 }
