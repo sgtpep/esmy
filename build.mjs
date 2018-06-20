@@ -187,7 +187,7 @@ async function resolvePackageEntry(name) {
     .resolveId(name, await findPackagesPath());
 }
 
-export default async function build(args) {
+export default async function(args) {
   for (const name of await detectBundlablePackages(args)) {
     await buildPackage(name);
   }
