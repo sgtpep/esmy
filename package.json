@@ -29,10 +29,10 @@
   "name": "esmy",
   "repository": "https://github.com/sgtpep/esmy.git",
   "scripts": {
-    "format": "prettier --write './**/*.{css,js,json,jsx,md,mjs}'",
-    "lint": "eslint --fix './**/*.{js,jsx,mjs}'",
+    "format": "prettier --write './**/*.{js,json,md,mjs}'",
+    "lint": "eslint --fix './**/*.{js,mjs}'",
     "prepublishOnly": "rollup -c",
-    "test": "prettier -l './**/*.{css,js,json,jsx,md,mjs}' && eslint './**/*.{js,jsx,mjs}'"
+    "test": "prettier -l './**/*.{js,json,md,mjs}' && eslint './**/*.{js,mjs}'"
   },
   "version": "1.2.0"
 }
