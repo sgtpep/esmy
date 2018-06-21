@@ -10,7 +10,7 @@ import replace from 'rollup-plugin-replace';
 import rimraf from 'rimraf';
 import rollup from 'rollup';
 
-const defaultEnv = 'development';
+const env = process.env.NODE_ENV || 'development';
 const externalPackages = ['jquery', 'react'];
 
 const rollupPlugins = [
@@ -18,16 +18,15 @@ const rollupPlugins = [
   json(),
   nodeResolve({ jsnext: true }),
   replace({
-    'process.env.NODE_ENV': JSON.stringify(getEnv()),
+    'process.env.NODE_ENV': JSON.stringify(env),
   }),
 ];
 
-async function buildPackage(name) {
+const buildPackage = async name => {
   const [packageVersion, packageEnv] = await parseESPackageVersion(name);
   const { version } = JSON.parse(
     fs.readFileSync(await findPackageManifestPath(name), 'utf8'),
   );
-  const env = getEnv();
   if (packageVersion !== version || packageEnv !== env) {
     const entryPath = await resolvePackageEntry(name);
     if (entryPath) {
@@ -55,22 +54,21 @@ async function buildPackage(name) {
       });
     }
   }
-}
+};
 
-async function detectBundlablePackages(args) {
-  return args.length ? filterPackageArgs(args) : detectDependencies();
-}
+const detectBundlablePackages = async args =>
+  args.length ? filterPackageArgs(args) : detectDependencies();
 
-async function detectDependencies() {
+const detectDependencies = async () => {
   const manifestPath = path.join(await findPrefixPath(), 'package.json');
   return fs.existsSync(manifestPath)
     ? Object.keys(
         JSON.parse(fs.readFileSync(manifestPath, 'utf8')).dependencies || {},
       ).filter(async name => fs.existsSync(await findPackageManifestPath(name)))
     : [];
-}
+};
 
-async function detectExcessiveESPackages() {
+const detectExcessiveESPackages = async () => {
   const dependencies = await detectDependencies();
   const names = dependencies.length
     ? dependencies
@@ -78,10 +76,10 @@ async function detectExcessiveESPackages() {
   return (await listPackages(await findESPackagesPath(), true)).filter(
     name => !names.includes(name),
   );
-}
+};
 
-function filterPackageArgs(args) {
-  return args
+const filterPackageArgs = args =>
+  args
     .map(arg => {
       try {
         var { name } = npmPackageArg(arg);
@@ -91,37 +89,28 @@ function filterPackageArgs(args) {
       return name;
     })
     .filter(Boolean);
-}
 
-async function findESPackagePath(name) {
-  return path.join(await findESPackagesPath(), `${name}.js`);
-}
+const findESPackagePath = async name =>
+  path.join(await findESPackagesPath(), `${name}.js`);
 
-async function findESPackagesPath() {
-  return path.join(await findPrefixPath(), 'es_modules');
-}
+const findESPackagesPath = async () =>
+  path.join(await findPrefixPath(), 'es_modules');
 
-async function findPackageManifestPath(name) {
-  return path.join(await findPackagesPath(), name, 'package.json');
-}
+const findPackageManifestPath = async name =>
+  path.join(await findPackagesPath(), name, 'package.json');
 
-async function findPackagesPath() {
-  return path.join(await findPrefixPath(), 'node_modules');
-}
+const findPackagesPath = async () =>
+  path.join(await findPrefixPath(), 'node_modules');
 
-async function findPrefixPath() {
+const findPrefixPath = async () => {
   if (!findPrefixPath.prefixPath) {
     findPrefixPath.prefixPath = await findNPMPrefix(process.cwd());
   }
   return findPrefixPath.prefixPath;
-}
+};
 
-function getEnv() {
-  return process.env.NODE_ENV || defaultEnv;
-}
-
-function listPackages(packagesPath, es = false) {
-  return fs.existsSync(packagesPath) && fs.statSync(packagesPath).isDirectory()
+const listPackages = (packagesPath, es = false) =>
+  fs.existsSync(packagesPath) && fs.statSync(packagesPath).isDirectory()
     ? fs
         .readdirSync(packagesPath)
         .reduce(
@@ -145,9 +134,8 @@ function listPackages(packagesPath, es = false) {
         })
         .map(name => (es ? name.replace(/\.js$/, '') : name))
     : [];
-}
 
-async function parseESPackageVersion(name) {
+const parseESPackageVersion = async name => {
   const packagePath = await findESPackagePath(name);
   return fs.existsSync(packagePath)
     ? new Promise(resolve => {
@@ -163,10 +151,10 @@ async function parseESPackageVersion(name) {
           stream.close();
         });
       })
-    : ['', defaultEnv];
-}
+    : ['', 'development'];
+};
 
-async function removeESPackage(name) {
+const removeESPackage = async name => {
   const packagePath = await findESPackagePath(name);
   rimraf.sync(packagePath);
   rimraf.sync(`${packagePath}.map`);
@@ -179,19 +167,18 @@ async function removeESPackage(name) {
       fs.rmdirSync(namespacePath);
     }
   }
-}
+};
 
-async function resolvePackageEntry(name) {
-  return rollupPlugins
+const resolvePackageEntry = async name =>
+  rollupPlugins
     .find(plugin => plugin.name === 'node-resolve')
     .resolveId(name, await findPackagesPath());
-}
 
-export default async function(args) {
+export default async args => {
   for (const name of await detectBundlablePackages(args)) {
     await buildPackage(name);
   }
   for (const name of await detectExcessiveESPackages()) {
     await removeESPackage(name);
   }
-}
+};

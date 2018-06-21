@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync, spawnSync } from 'child_process';
 
-async function detectCommand() {
+const detectCommand = async () => {
   if (
     fs.existsSync(path.join(await findNPMPrefix(process.cwd()), 'yarn.lock'))
   ) {
@@ -19,9 +19,9 @@ async function detectCommand() {
     }
     return ['yarn', 'add'];
   }
-}
+};
 
-async function main() {
+const main = async () => {
   const args = process.argv.slice(2);
   if (process.argv.length > 2) {
     const [command, ...commandArgs] = await detectCommand();
@@ -33,6 +33,6 @@ async function main() {
     }
   }
   await build(args);
-}
+};
 
 main();
