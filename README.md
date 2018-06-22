@@ -4,7 +4,7 @@
 
 Converts npm packages to native [ES6 modules](http://exploringjs.com/es6/ch_modules.html) which can be imported directly from modern browsers without bundlers and transpilers.
 
-For example, to install the `react` package as a browser-compatible ES6 module run this command: `npx esmy react`, or: `yarn create esmy react`. The file `./es_modules/react.js` will be created. Modern browsers can import it like this:
+For example, to install the `react` package as a browser-compatible ES6 module run this command: `npx esmy react`, or: `npm init esmy react`, or: `yarn create esmy react`. The file `./es_modules/react.js` will be created. Modern browsers can import it like this:
 
 ```html
 <script type="module">
@@ -29,6 +29,12 @@ To quickly install npm packages as browser-compatible ES6 modules, without insta
 
 ```shell
 npx esmy react
+```
+
+For older `npm`, or if your system has no `npx` executable:
+
+```shell
+npm init esmy react
 ```
 
 Or if you prefer `yarn` and have it installed:
