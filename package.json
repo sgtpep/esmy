@@ -25,7 +25,7 @@
     "package",
     "vanilla"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "name": "esmy",
   "repository": "https://github.com/sgtpep/esmy.git",
   "scripts": {
